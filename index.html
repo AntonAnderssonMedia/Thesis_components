@@ -1,20 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thesis - Components</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anton Andersson — Projects</title>
+  <meta name="description" content="Minimal hub linking to selected GitHub projects by Anton Andersson." />
+  <meta name="theme-color" content="#0b0b0f" />
+  <meta property="og:title" content="Anton Andersson — Projects" />
+  <meta property="og:description" content="Minimal hub linking to selected GitHub projects." />
+  <meta property="og:type" content="website" />
+  <style>
+    :root{
+      --bg-0:#0b0b0f; --bg-1:#11111a; --bg-2:#0a0a12;
+      --fg:#eaeaf2; --muted:#a6a6b3; --accent:#7c9eff; --accent-2:#ff77aa;
+      --card:#0e0e15cc; --border:#ffffff14; --ring:#88aaff80;
+      --radius:16px; --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --maxw:720px;
+    }
+    * { box-sizing:border-box }
+    html,body { height:100% }
+    body{
+    margin:0;
+    color:var(--fg);
+    font:16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    background: linear-gradient(120deg, #2c2c2c, #333, #2e2e2e);
+    background-size: 300% 300%;
+    animation: subtleDrift 20s ease-in-out infinite;
+    overflow-x:hidden;
+    }
+
+    /* animated aurora layer */
+    .aurora{
+      position:fixed; inset:-20vmax; filter: blur(60px) saturate(130%);
+      background:
+        radial-gradient(35% 25% at 20% 30%, color-mix(in oklab, var(--accent) 70%, #ffffff 10%) 0%, transparent 60%),
+        radial-gradient(30% 22% at 80% 20%, color-mix(in oklab, var(--accent-2) 70%, #ffffff 10%) 0%, transparent 60%),
+        radial-gradient(28% 20% at 70% 80%, color-mix(in oklab, #a7f3d0 70%, #ffffff 10%) 0%, transparent 60%);
+      opacity:.55; pointer-events:none;
+      animation: drift 22s linear infinite alternate;
+    }
+    
+    @keyframes drift { 
+      0% { transform: translate3d(-3%, -2%, 0) rotate(0.5deg) scale(1.02); }
+      100%{ transform: translate3d(3%, 2%, 0) rotate(-0.5deg) scale(1.06); }
+    }
+
+    /* subtle grain */
+    .grain{ position:fixed; inset:0; pointer-events:none; opacity:.06; mix-blend-mode:overlay; background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity=".9"/></svg>'); background-size:140px 140px; }
+
+    main{
+      min-height:100dvh; display:grid; place-items:center; padding:7vh 20px;
+    }
+    .wrap{ width:100%; max-width:var(--maxw); position:relative; z-index:1; }
+    header{
+      margin-bottom:28px; display:flex; align-items:center; gap:14px;
+    }
+    .avatar{
+      width:52px; height:52px; border-radius:12px; background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      display:grid; place-items:center; color:#0b0b0f; font-weight:800; letter-spacing:.5px; box-shadow: var(--shadow);
+    }
+    h1{ font-size:clamp(1.25rem, 1rem + 2vw, 2rem); margin:0; }
+    .subtitle{ color:var(--muted); margin-top:2px; }
+
+    .grid{
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px;
+    }
+    .card{
+      position:relative; border-radius:var(--radius);
+      background:linear-gradient(180deg, #ffffff08, #00000000);
+      border:1px solid var(--border); padding:18px 16px; text-decoration:none; color:inherit;
+      box-shadow: var(--shadow); overflow:hidden; transform-style:preserve-3d;
+      transition: transform .25s ease, border-color .25s ease, background .25s ease;
+      will-change: transform;
+    }
+    .card:focus-visible{ outline:2px solid var(--ring); outline-offset:2px; }
+    .card:hover{ border-color:#ffffff2a; background:linear-gradient(180deg, #ffffff10, #00000000); }
+    .card h3{ margin:0 0 6px; font-size:1.05rem; letter-spacing:.2px; }
+    .card p{ margin:0; color:var(--muted); font-size:.95rem; }
+    .chip{
+      position:absolute; top:10px; right:10px; font-size:.75rem; padding:.25rem .5rem; border-radius:999px; 
+      border:1px solid var(--border); background:#00000040; backdrop-filter: blur(6px);
+    }
+
+    footer{ margin-top:22px; color:var(--muted); font-size:.9rem; display:flex; gap:14px; align-items:center; }
+    .social a{ color:var(--muted); text-decoration:none; border-bottom:1px dotted #ffffff33; }
+    .social a:hover{ color:var(--fg); border-bottom-color:#ffffff66; }
+
+    /* hover glow */
+    .glow{
+      position:absolute; inset:-40%; opacity:0; pointer-events:none;
+      background: radial-gradient(600px 400px at var(--mx,50%) var(--my,50%), color-mix(in oklab, var(--accent) 50%, transparent), transparent 60%);
+      transition: opacity .3s ease;
+    }
+    .card:hover .glow{ opacity:.5; }
+
+    /* Reduced motion accessibility */
+    @media (prefers-reduced-motion: reduce){
+      .aurora{ animation:none }
+      .card{ transition:none }
+      .glow{ display:none }
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{ --fg:#111218; --muted:#44485a; --card:#ffffffcc; --border:#00000018; --ring:#3b82f680; }
+      body{ background: radial-gradient(1000px 700px at 15% 15%, #f6f7ff 0%, transparent 60%), linear-gradient(180deg, #f9f9ff, #f1f2f8); }
+    }
+  </style>
 </head>
 <body>
-  <main>
-    <h1>Thesis components</h1>
-    <p>Steps taken towards the final thesis project
-    </p>
+  <!-- <div class="aurora"></div>
+  <div class="grain"></div> -->
 
-    <nav>
-      <a href="https://antonanderssonmedia.github.io/ThreeJS-showcase/" target="_blank">ThreeJS Showcase</a>
-    </nav>
+  <main>
+    <div class="wrap">
+      <header>
+        <div class="avatar" aria-hidden="true">LiU</div>
+        <div>
+          <h1>Anton Andersson</h1>
+          <div class="subtitle">Thesis related GitHub Projects</div>
+        </div>
+      </header>
+
+      <section class="grid" id="cards">
+
+        <!-- CARD TEMPLATE: update href + title + description -->
+        <a class="card" href="https://antonanderssonmedia.github.io/ThreeJS-showcase/" target="_blank" rel="noopener">
+          <div class="glow"></div>
+          <span class="chip">three.js</span>
+          <h3>ThreeJS Showcase</h3>
+          <p>Small WebGL demos exploring materials, lighting and orbit controls.</p>
+        </a>
+
+        <a class="card" href="https://antonanderssonmedia.github.io/CameraWebFeed/" target="_blank" rel="noopener">
+          <div class="glow"></div>
+          <span class="chip">HTML</span>
+          <h3>Web Camera feed</h3>
+          <p>Requesting access and showing camera feed</p>
+        </a>
+
+      </section>
+
+      <footer>
+        <div class="social">More on <a href="https://github.com/AntonAnderssonMedia" target="_blank" rel="noopener">GitHub</a></div>
+      </footer>
+    </div>
   </main>
+
+  <script>
+    // Subtle tilt + glow that respects reduced motion
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!prefersReduced) {
+      document.querySelectorAll('.card').forEach(card => {
+        const glow = card.querySelector('.glow');
+        card.addEventListener('pointermove', (e) => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width;
+          const y = (e.clientY - r.top) / r.height;
+          // tilt
+          const tiltX = (y - 0.5) * -6;   // up/down
+          const tiltY = (x - 0.5) * 6;    // left/right
+          card.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(0)`;
+          // move glow
+          glow.style.setProperty('--mx', `${x * 100}%`);
+          glow.style.setProperty('--my', `${y * 100}%`);
+        });
+        card.addEventListener('pointerleave', () => {
+          card.style.transform = 'none';
+        });
+      });
+    }
+  </script>
 </body>
 </html>
