@@ -65,6 +65,13 @@
     .grid{
       display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px;
     }
+    .section-title{
+      margin:28px 0 12px;
+      font-size:.95rem;
+      letter-spacing:.08em;
+      color:var(--muted);
+      font-weight:700;
+    }
     .card{
       position:relative; border-radius:var(--radius);
       background:linear-gradient(180deg, #ffffff08, #00000000);
@@ -159,7 +166,10 @@
           <h3>Map plane+roads+events</h3>
           <p>Allowing placement of a map with events & roads on a detected surface.</p>
         </a>
-
+      </section>
+      
+      <h2 class="section-title">USER TESTS</h2>
+      <section class="grid" id="user-tests">
         <a class="card" href="https://antonanderssonmedia.github.io/OneTripTap/" target="_blank" rel="noopener">
           <div class="glow"></div>
           <span class="chip">WebXR AR</span>
@@ -174,8 +184,12 @@
           <p>AR city map plane rendering all bus trips during 1 hour, with tap details+highlight and time filtering (2.4 x 3.2m)</p>
         </a>
 
-        
-
+        <a class="card" href="https://antonanderssonmedia.github.io/TwoTrips" target="_blank" rel="noopener">
+          <div class="glow"></div>
+          <span class="chip">WebXR AR</span>
+          <h3>TwoTrips</h3>
+          <p>Compare two trips in AR with map, roads, timelines, and duration comparison controls.</p>
+        </a>
       </section>
 
       <footer>
